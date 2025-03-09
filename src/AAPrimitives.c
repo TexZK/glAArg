@@ -146,7 +146,7 @@ double log2( double n )
 // -------------------------------------------------
 static inline void glAASetContext() {
 #if defined(__APPLE__)
-	cgl_ctx = CGLGetCurrentContext();	
+	cgl_ctx = CGLGetCurrentContext();
 #endif
 }
 
@@ -179,7 +179,7 @@ bool introspectMIPGEN() {
 		if (hasCLIENTTEX) glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, 1);
 		// Generate the full texture mipmap pyramid.
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA, GL_UNSIGNED_BYTE, tex);
-		if (hasCLIENTTEX) glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, 0);		
+		if (hasCLIENTTEX) glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE, 0);
 
 		// now check the results
 		glGetTexImage(GL_TEXTURE_2D, 1, GL_ALPHA, GL_UNSIGNED_BYTE, tex1);
@@ -222,7 +222,7 @@ void APIENTRY glAAInit() {
 #if defined(__APPLE__)
 		// this should be true on all renderers except Rage 128 and Radeon 7000.
 		hasVAR = (strstr((char *)extensions, "GL_APPLE_vertex_array_range") != NULL);
-#endif	
+#endif
 		// on OS X, this should be true on 10.2.3 and later, but it does not work reliably on some GPUs.
 		hasMIPGEN = (strstr((char *)extensions, "GL_SGIS_generate_mipmap") != NULL);
 
@@ -238,7 +238,7 @@ void APIENTRY glAAInit() {
 	// It is easy to modify this to use regular vertex array submission instead.
 	// That provides a good speed boost on most systems, but it is actually slower on the Radeon 7000,
 	// and on Mac OS X, that is one of the only two cards which do not have VAR.
-	// A future update will provide VBO and/or non-interleaved vertex array submission. 
+	// A future update will provide VBO and/or non-interleaved vertex array submission.
 	//
 	if (hasVAR) {
 		int j;
@@ -332,14 +332,14 @@ void APIENTRY glAAExit() {
 // For a 32 x 32 circle, this means a  64x 64 alpha mip pyramid, or ~  5k of VRAM.
 // For a 256x256 circle, this means a 512x512 alpha mip pyramid, or ~341k of VRAM.
 //
-inline float ifun(float x, float y, float F) {   		// compute falloff at x,y with exponent F [-1..1]
+float ifun(float x, float y, float F) {   		// compute falloff at x,y with exponent F [-1..1]
 	float S = (x*x + y);
 	float L;
 	if (S) {											// estimate sqrt, accurate to about 1/4096
 		L = frsqrtes_nr(S);
 		L = L * S;
 	}
-	else 
+	else
 		L = 0.0f;
 	if (F == 0.0f)										// intensity: [-1..0..1] = bloom..normal..fuzzy
 		S = 0.0f;
@@ -430,7 +430,7 @@ void APIENTRY glAAGenerateAATex(float F, GLuint id, float alias) {			// compute 
 				}
 			}
 			// Set filtering depending on our aliasing mode.
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (alias>0.66)?GL_NEAREST:GL_LINEAR);	
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (alias>0.66)?GL_NEAREST:GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, (alias>0.33)?((alias>0.66)?GL_NEAREST:GL_LINEAR_MIPMAP_NEAREST):GL_LINEAR_MIPMAP_LINEAR);
 			// now fix the upper mip levels so that 1 px points/lines stay bright:
 			// at 1 px, the circle texture's default brightness is pi/4 = 0.78. This is geometrically
@@ -469,7 +469,7 @@ void APIENTRY glAABegin(GLenum mode) {			// cgl_ctx must have been set prior to 
 			case GL_LINES: {
 				glAA_alpha_fix = MIN(1.0f, glAA_line_width);
 				// force 8 vertex alignment
-				glAA_VAR_skip = glAA_VAR_i&4;				
+				glAA_VAR_skip = glAA_VAR_i&4;
 			} break;
 		}
 		glAAFlush();
@@ -498,7 +498,7 @@ void APIENTRY glAAFlush(void) {
 	if (useVAR){
 		static int glAA_VAR_ip = 0;
 		int length = glAA_VAR_i-glAA_VAR_ip;
-				
+
 		if (length > 0){
 			switch (glAA_mode) {
 				case GL_POINTS: {
@@ -559,7 +559,7 @@ void APIENTRY glAADisable(GLenum cap) {
 
 void APIENTRY glAAPointSize(float s) {
 	float size = ((s>0.0f) ? s: 1.0f);
-	
+
 	if (size != glAA_point_size) {
 		float r = MAX(1.0f, size);
         float minr = 0.0f;
@@ -594,7 +594,7 @@ void APIENTRY glAAPointLight(GLCoord2 light) {   // passed in point normalized t
 		}
 	}
 	x+=1.0f; y+=1.0f;
-	
+
 	glAA_plight[0] = 256*((2.0f-x)*(2.0f-y));
 	glAA_plight[1] = 256*(      x *(2.0f-y));
 	glAA_plight[2] = 256*(      x *      y);
@@ -605,7 +605,7 @@ void APIENTRY glAAPointLight(GLCoord2 light) {   // passed in point normalized t
 
 void APIENTRY glAALineWidth(float w) {
 	float width = ((w>0.0f) ? w : 1.0f);
-	
+
 	if (width != glAA_line_width) {
 		float r = MAX(1.0f, width);
         float minr = 0.0f;
@@ -712,7 +712,7 @@ void APIENTRY glAAVertex2f(float x, float y) {
 				c1 = (c1 & 0xFFFFFF00) | (((c1 & 0x000000FF)*int_alpha_fix)>>8);
 			}
 			c2 = c1, c3 = c1, c4 = c1;
-			
+
 			// apply saturation lighting if needed
 			if (glAA_enable_plight) {
 				c1 = scalesatRGB(c1, glAA_plight[0]);
@@ -724,7 +724,7 @@ void APIENTRY glAAVertex2f(float x, float y) {
 			c2 = ntohl(c2);
 			c3 = ntohl(c3);
 			c4 = ntohl(c4);
-			
+
 			if (useVAR){
 				int i = glAA_VAR_i;
                 int room = 0;
@@ -734,13 +734,13 @@ void APIENTRY glAAVertex2f(float x, float y) {
 				glAA_VAR[i+3].rgba = c4;
 				glAA_VAR[i  ].tx = glAA_VAR[i+3].tx =
 				glAA_VAR[i  ].ty = glAA_VAR[i+1].ty = psz-bord;
-				glAA_VAR[i+1].tx = glAA_VAR[i+2].tx = 
+				glAA_VAR[i+1].tx = glAA_VAR[i+2].tx =
 				glAA_VAR[i+2].ty = glAA_VAR[i+3].ty = pdb+bord;
 				glAA_VAR[i  ].x = glAA_VAR[i+3].x = centx;
 				glAA_VAR[i  ].y = glAA_VAR[i+1].y = centy;
 				glAA_VAR[i+1].x = glAA_VAR[i+2].x = centx+size;
 				glAA_VAR[i+2].y = glAA_VAR[i+3].y = centy+size;
-				glAA_VAR_i += 4; 
+				glAA_VAR_i += 4;
 				room = VAR_size*(glAA_fence+1)-glAA_VAR_i;
 				if (room < 4) { glAA_VAR_skip = room; glAAFlush();}
 			}
@@ -796,13 +796,13 @@ void APIENTRY glAAVertex2f(float x, float y) {
 				x1 = glAA_v[glAA_vp].x;		// shadow globals
 				y1 = glAA_v[glAA_vp].y;
 				bord = glAA_line_border;
-				maxr = glAA_line_maxr;				
+				maxr = glAA_line_maxr;
 				alpha_fix = glAA_alpha_fix;
 				enable_stipple = glAA_enable_stipple;
 
 				perp_y = x1-x;
 				perp_x = y-y1;
-			
+
 				factor = perp_y*perp_y+perp_x*perp_x;
 				if (factor) {
 					perpd = frsqrtes_nr(factor);
@@ -870,7 +870,7 @@ void APIENTRY glAAVertex2f(float x, float y) {
 						}
 						b = (b+1)%glAA_stipple_count;
 					}
-					
+
 					if (s >= leng-dash) {dash = MAX(1.0f, leng-s);}		// clip final dash
 //					printf("glAArg: line w %.1f leng %.1f using(%d) %.1f dash [%d], s is %.1f, gap is %.1f [%d]\n", width, leng, glAA_enable_stipple, dash, b, s, gap, b+1);
 					x = x1 + (dash-1.0f)*unit_x;
@@ -881,7 +881,7 @@ void APIENTRY glAAVertex2f(float x, float y) {
 					cp2 = MAX(0.0f, (s-width)*perpd);
 					cw4 = MIN(1.0f, (s-0.5f+dash)*perpd);
 					cp4 = MIN(1.0f, (s+dash+width)*perpd);
-			
+
 					// pick vertex colors and adjust alpha if needed
 					c1 = (glAA_vc[glAA_vp]) ? glAA_v[glAA_vp].rgba : glAA_v[glAA_vcl].rgba;
 					c2 = (glAA_vc[glAA_vi]) ? glAA_v[glAA_vi].rgba : glAA_v[glAA_vcl].rgba;
@@ -905,7 +905,7 @@ void APIENTRY glAAVertex2f(float x, float y) {
 						glAA_VAR[i+2].tx = glAA_VAR[i  ].tx = glAA_VAR[i+4].tx = glAA_VAR[i+6].tx = pdb+bord;
 						glAA_VAR[i+3].ty = glAA_VAR[i+2].ty = pct;
 						glAA_VAR[i+5].ty = glAA_VAR[i+4].ty = pct + GLAARG_RADEON7000_KLUDGE;
-						
+
 						glAA_VAR[i  ].x = x1-perp_x-parl_x;		glAA_VAR[i  ].y = y1-perp_y-parl_y;
 						glAA_VAR[i+1].x = x1+perp_x-parl_x;		glAA_VAR[i+1].y = y1+perp_y-parl_y;
 						glAA_VAR[i+2].x = x1-perp_x;			glAA_VAR[i+2].y = y1-perp_y;
@@ -914,14 +914,14 @@ void APIENTRY glAAVertex2f(float x, float y) {
 						glAA_VAR[i+5].x = x+perp_x;				glAA_VAR[i+5].y = y+perp_y;
 						glAA_VAR[i+6].x = x-perp_x+parl_x;		glAA_VAR[i+6].y = y-perp_y+parl_y;
 						glAA_VAR[i+7].x = x+perp_x+parl_x;		glAA_VAR[i+7].y = y+perp_y+parl_y;
-			
+
 						glAA_VAR_i += 8;
 						room = VAR_size*(glAA_fence+1)-glAA_VAR_i;
 						if (room < 8) { glAA_VAR_skip = room; glAAFlush();}
 
 						i = glAA_VAR_i;
 					}
-					else { // immediate	
+					else { // immediate
 						int cl1 = ntohl(lerpRGBA(c1, c2, cp2));
 						int cl2 = ntohl(lerpRGBA(c1, c2, cw2));
 						int cl3 = ntohl(lerpRGBA(c1, c2, cw4));
@@ -938,8 +938,8 @@ void APIENTRY glAAVertex2f(float x, float y) {
 							glVertex2f(x1-perp_x, y1-perp_y);
 							glTexCoord2f(psz-bord,  pct);
 							glVertex2f(x1+perp_x, y1+perp_y);
-						
-							glColor4ubv((const GLubyte *)&cl3);				
+
+							glColor4ubv((const GLubyte *)&cl3);
 							glTexCoord2f(pdb+bord,  pct + GLAARG_RADEON7000_KLUDGE);
 							glVertex2f(x-perp_x, y-perp_y);
 							glTexCoord2f(psz-bord,  pct + GLAARG_RADEON7000_KLUDGE);

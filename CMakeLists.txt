@@ -23,6 +23,9 @@ endforeach( KEYWORD )
 # needed for ntohl()
 find_library( WS2_32_LIBRARY ws2_32 )
 
+# needed for ceilf()
+find_library( MATH_LIBRARY m )
+
 # give FindGLUT.cmake a helping hand
 if( WIN32 )
     set( GLUT_ROOT_PATH "c:/projects/root" )
@@ -54,9 +57,12 @@ if( MSVC )
 endif( MSVC )
 
 include_directories( include )
+include_directories( src )
 
 add_executable( glAArgDemo "src/main.c" "src/AAPrimitives.c" )
 target_link_libraries( glAArgDemo ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} )
 if( WIN32 )
   target_link_libraries( glAArgDemo ws2_32 )
+else()
+  target_link_libraries( glAArgDemo m )
 endif( WIN32 )
